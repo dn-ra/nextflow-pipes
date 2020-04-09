@@ -8,33 +8,54 @@
 */
 
 
-//--------inputs------------
+//--------inputs------------///
 params.virus_reference = '/home/daniel/wuhan_coronavirus_australia.fasta'
-params.host_reference = '//DataOnline/Data/raw_external/Coronavirus/monkey/newdb/Chlorocebus_sabaeus.ChlSab1.1.dna.toplevel.fa.gz'
+//params.host_reference = '/DataOnline/Data/raw_external/Coronavirus/monkey/newdb/Chlorocebus_sabaeus.ChlSab1.1.dna.toplevel.fa.gz'
+params.host_reference = ''
 params.leader = '/DataOnline/Data/raw_external/Coronavirus/Direct_RNA_Sequence_Cellular/doherty_analysis/leader.fa'
 params.reads = ''
+println(params.reads)
+
+host_map="ON"
+
+//--------evaluate inputs--------///
+
+if (params.reads == '') exit 1, 'Please provide a one or more fastq read files with --reads []'
 
 
-//--------check inputs--------
+if (params.host_reference == '') { log.warn 'Host genome not provided. Analysis will proceed without host genome mapping.'
+			host_map = "OFF" } 
+/* DO THIS IN THE HOST MAP SECTION?
+else if (host_map != "OFF") host = file(params.host_reference) {
+if (!host.exists()) exit 1, 'Expected host mapping file does not exist: ${host}'exit 1, 'Expected host mapping file does not exist: ${host}'
+}
+*/
 
-host = file(params.host_reference)
 virus = file(params.virus_reference)
 leader = file(params.leader)
-
-if (!host.exists()) println 'Warning: Host genome not provided. Analysis will proceed without host genome mapping.'
 if (!virus.exists()) exit 1, 'SARS-CoV-2 reference file does not exist: ${virus}'
-if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${leader}'
+if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${params.leader}'
 
-//-------launch reads channel------
 
-input_channel = Channel.fromPath(params.reads)
+//-------launch reads channel------///
+/* will need to set this up to handle folders of multiple fast5s */
+
+Channel 
+	.fromPath(params.reads, checkIfExists: true) 
+	.collect()
+	.subscribe { println it }
+	.into {fastq_reads} 
+
+//--------output directories---------///
+
+//-------demux???-------------------///
 
 //--------minimap for virus----------///
 
 process whole_genome_map {
 	input:
-	file read_file from input_channel
-	file(virus)
+	file file(read_file) from fastq_reads
+	file reference_file
 	
 	output:
 	file "virus_map.bam" into minimap_out
@@ -47,7 +68,7 @@ process whole_genome_map {
 	}
 process leader_map {
 	input:
-	file read_file from input channel
+	file read_file from ___
 	file(leader)
 
 	output:
@@ -57,7 +78,7 @@ process leader_map {
 	'''
 	/sw/minimap2/minimap2-2.11_x64-linux/minimap2 -ax map-ont -k 14 -un $leader_reference $read_file | samtools view -hb > minimap_out.bam
 	'''
-	
+	}
 //-------minimap for host---------------///
 
 process host_map {
@@ -68,8 +89,9 @@ process host_map {
 	output:
 	
 	script:
-	
-}
+	'''
+	'''
+	}
 
 
 //-------find mRNAs--------------------///
