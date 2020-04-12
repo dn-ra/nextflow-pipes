@@ -46,12 +46,13 @@ fastq_reads = Channel.from(params.reads)
 	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" } )
 	.toList()
 	.subscribe { println it }
+	.into{ saveInputs, wholeGenomeMap, leaderMap, hostMap }
 	
 
 //--------output directories---------///
 
 //--------record input file names---///
-
+process saveInputs {
 input:
 	file fastq_reads
 
@@ -62,7 +63,7 @@ script:
 	"""
 	echo $fastq_reads > input_fastqs.txt
 	"""
-
+}
 //-------demux???-------------------///
 
 //--------minimap------------------///
