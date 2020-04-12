@@ -48,7 +48,6 @@ fastq_reads = Channel
 	.collect()
 	.subscribe { println it }
 	
-files_all_raw = Channel.from()
 
 //--------output directories---------///
 
