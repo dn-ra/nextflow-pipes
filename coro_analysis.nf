@@ -35,15 +35,14 @@ if (!host.exists()) exit 1, 'Expected host mapping file does not exist: ${host}'
 
 virus = file(params.virus_reference)
 leader = file(params.leader)
-if (!virus.exists()) exit 1, 'SARS-CoV-2 reference file does not exist: ${virus}'
+if (!virus.exists()) exit 1, 'SARS-CoV-2 reference file does not exist: ${params.virus}'
 if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${params.leader}'
 
 
 //-------launch reads channel------///
 /* will need to set this up to handle folders of multiple fast5s */
 
-fastq_reads = Channel 
-	.fromPath(params.reads)
+fastq_reads = Channel.fromPath(params.reads)
 	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" }
 	.collect()
 	.subscribe { println it }
