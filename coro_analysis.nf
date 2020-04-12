@@ -14,14 +14,16 @@ params.virus_reference = '/home/daniel/wuhan_coronavirus_australia.fasta'
 params.host_reference = ''
 params.leader = '/DataOnline/Data/raw_external/Coronavirus/Direct_RNA_Sequence_Cellular/doherty_analysis/leader.fa'
 params.reads = ''
+params.experiment = ''
+
 println(params.reads)
 
 host_map="ON"
 
 //--------evaluate inputs--------///
 
-if (params.reads == '') exit 1, 'Please provide a one or more fastq read files with --reads []'
-
+if (params.reads == '') exit 1, 'Please provide one or more fastq read files with --reads \"[]\" (must be quoted if using wildcard *!)'
+if (params.experiment == '') exit 1, 'Please provide an experiment name for storage of outputs with --experiment'
 
 if (params.host_reference == '') { log.warn 'Host genome not provided. Analysis will proceed without host genome mapping.'
 			host_map = "OFF" } 
@@ -40,11 +42,13 @@ if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${
 //-------launch reads channel------///
 /* will need to set this up to handle folders of multiple fast5s */
 
-Channel 
-	.fromPath(params.reads, checkIfExists: true) 
-	.collect()
+fastq_reads = Channel 
+	.fromPath(params.reads)
+	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" }
+	.collect() #turns it into a value channel
 	.subscribe { println it }
-	.into {fastq_reads} 
+	
+files_all_raw = Channel.from()
 
 //--------output directories---------///
 
@@ -54,15 +58,16 @@ Channel
 
 process whole_genome_map {
 	input:
-	file file(read_file) from fastq_reads
-	file reference_file
+	file fastq_reads
+	file virus
 	
 	output:
 	file "virus_map.bam" into minimap_out
 
 	script:
 	'''
-	/sw/minimap2/minimap2-2.11_x64-linux/minimap2 -ax splice -un -k 14 $reference_file $read_file | samtools view -hb > minimap_out.bam
+	#send input files to an output summary
+	/sw/minimap2/minimap2-2.11_x64-linux/minimap2 -ax splice -un -k 14 $reference_file $fastq_reads | samtools view -hb > minimap_out.bam
 	
 	'''
 	}
