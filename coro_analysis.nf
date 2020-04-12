@@ -44,7 +44,6 @@ if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${
 
 fastq_reads = Channel.fromPath(params.reads)
 	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" } )
-	.collect()
 	.subscribe { println it }
 	
 
@@ -53,7 +52,7 @@ fastq_reads = Channel.fromPath(params.reads)
 //--------record input file names---///
 
 input:
-	file fastq_reads
+	set file fastq_reads
 
 output:
 	file 'input_fastqs.txt'
