@@ -52,7 +52,7 @@ fastq_reads = Channel.fromPath(params.reads)
 //--------record input file names---///
 
 input:
-	set file fastq_reads
+	file fastq_reads
 
 output:
 	file 'input_fastqs.txt'
