@@ -43,7 +43,7 @@ if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${
 /* will need to set this up to handle folders of multiple fast5s */
 
 fastq_reads = Channel.fromPath(params.reads)
-	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" }
+	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" } )
 	.collect()
 	.subscribe { println it }
 	
@@ -70,30 +70,32 @@ process wholeGenomeMap {
 	
 	'''
 	}
-process leader_map {
+process leaderMap {
 	input:
-	file read_file from ___
-	file(leader)
+	file fastq_reads
+	file leader
 
 	output:
 	file "leader_map.bam" into detect_subgenomes_from_leader
 	
 	script:
 	'''
-	/sw/minimap2/minimap2-2.11_x64-linux/minimap2 -ax map-ont -k 14 -un $leader_reference $read_file | samtools view -hb > minimap_out.bam
+	/sw/minimap2/minimap2-2.11_x64-linux/minimap2 -ax map-ont -k 14 -un $leader $fastq_reads | samtools view -hb > minimap_out.bam
 	'''
 	}
 //-------minimap for host---------------///
 
 process host_map {
 	input:
-	file read_file from input_channel
-	file(host)
+	file fastq_reads
+	file host
 
 	output:
 	
+	
 	script:
 	'''
+	echo 'test'
 	'''
 	}
 
