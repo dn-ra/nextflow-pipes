@@ -45,7 +45,7 @@ if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${
 fastq_reads = Channel 
 	.fromPath(params.reads)
 	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" }
-	.collect() #turns it into a value channel
+	.collect()
 	.subscribe { println it }
 	
 files_all_raw = Channel.from()
