@@ -56,6 +56,7 @@ fastq_reads = Channel
 //--------minimap for virus----------///
 
 process wholeGenomeMap {
+
 	input:
 	file fastq_reads
 	file virus
