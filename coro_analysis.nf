@@ -46,7 +46,7 @@ fastq_reads = Channel.from(params.reads)
 	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" } )
 	.toList()
 	.subscribe { println it }
-	.into{ saveInputs, wholeGenomeMap, leaderMap, hostMap }
+	.into{ saveInputs; wholeGenomeMap; leaderMap; hostMap }
 	
 
 //--------output directories---------///
