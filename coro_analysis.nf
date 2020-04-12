@@ -50,9 +50,22 @@ fastq_reads = Channel.fromPath(params.reads)
 
 //--------output directories---------///
 
+//--------record input file names---///
+
+input:
+	file fastq_reads
+
+output:
+	file 'input_fastqs.txt'
+	
+script:
+	"""
+	echo $fastq_reads > input_fastqs.txt
+	"""
+
 //-------demux???-------------------///
 
-//--------minimap for virus----------///
+//--------minimap------------------///
 
 process wholeGenomeMap {
 
@@ -83,9 +96,11 @@ process leaderMap {
 	/sw/minimap2/minimap2-2.11_x64-linux/minimap2 -ax map-ont -k 14 -un $leader $fastq_reads | samtools view -hb > minimap_out.bam
 	'''
 	}
-//-------minimap for host---------------///
+//-------minimap for host (optional) ---------------///
 
-process host_map {
+
+if (host_map == 'ON') {
+process hostMap {
 	input:
 	file fastq_reads
 	file host
@@ -97,6 +112,7 @@ process host_map {
 	'''
 	echo 'test'
 	'''
+	}
 	}
 
 
