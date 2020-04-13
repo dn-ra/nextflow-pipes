@@ -21,12 +21,13 @@ threshold=4
 influence=0.25
 
 
-length_data <- read.csv(args[0],  header=F, col.names = c('Read_Length'))
-bins <- hist(length_data$Read_Length, breaks=n_bins)
+length_data <- read.csv(args[1],  header=F, col.names = c('Read_Length'))
 
 
+pdf('leader_read_hist.pdf')
+bins <- hist(length_data$Read_Length, breaks=n_bins, plot=FALSE)
 plot(bins, main = 'Length histogram of reads containing 5\' leader sequence', ylab='Count', xlab='Read Length')
-
+dev.off()
 
 thresh_bins <- bins$breaks[which(ThresholdingAlgo(bins$density, lag=lag,threshold=threshold, influence=influence)$signals ==1)]
 sg_bins <- bin_thresholds(thresh_bins) #output as list
