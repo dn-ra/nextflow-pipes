@@ -42,10 +42,9 @@ if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${
 //-------launch reads channel------///
 /* will need to set this up to handle folders of multiple fast5s */
 
-fastq_reads = Channel.from(params.reads)
+Channel.fromPath(params.reads)
 	.ifEmpty( {exit 1, "Cannot find any readfiles matching: ${params.reads}" } )
-	.toList()
-	.subscribe { println it }
+	.collect()
 	.into{ saveInputs; wholeGenomeMap; leaderMap; hostMap }
 	
 
@@ -54,7 +53,7 @@ fastq_reads = Channel.from(params.reads)
 //--------record input file names---///
 process saveInputs {
 input:
-	file fastq_reads
+	file fastq_reads from saveInputs
 
 output:
 	file 'input_fastqs.txt'
@@ -64,6 +63,7 @@ script:
 	echo $fastq_reads > input_fastqs.txt
 	"""
 }
+
 //-------demux???-------------------///
 
 //--------minimap------------------///
