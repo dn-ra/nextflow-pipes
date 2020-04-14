@@ -5,17 +5,17 @@
 READS='/DataOnline/Data/raw_external/Coronavirus/Direct_RNA_Sequence_Cellular/20200211_1144_GA50000_FAL90649_37c13261/fastq_pass/Cells.fastq'
 
 #minimap2 location
-MM2 = '/sw/minimap2/minimap2-2.11_x64-linux/minimap2'
+MM2='/sw/minimap2/minimap2-2.11_x64-linux/minimap2'
 
 echo '>Leader
 ACCUUCCCAGGUAACAAACCAACCAACUUUCGAUCUCUUGUAGAUCUGUUCUCUAAACGAAC' > leader.fa
 
 
 #map to whole genome
-$MM2 -ax splice -un /home/daniel/wuhan_coronavirus_australia.fasta $READS | samtools view -hF4b > whole_genome_mapped.bam
+$MM2 -ax splice -un /home/daniel/wuhan_coronavirus_australia.fasta $READS | samtools view -hF4 -b > whole_genome_mapped.bam
 
 #map to leader. Modify -k paramater as fits
-$MM2 -ax map-ont -un leader.fa $READS | satmools view -hF4b > leader_mapped.bam
+$MM2 -ax map-ont -un leader.fa $READS | samtools view -hF4 -b > leader_mapped.bam
 
 #extract lengths of reads with leader
 seqtk subseq $READS <(samtools view leader_mapped.bam | cut -f 1 -| sort | uniq) > leader_reads.fq
