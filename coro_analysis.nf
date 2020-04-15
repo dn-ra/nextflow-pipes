@@ -7,7 +7,6 @@
 			Taiaroa G, et al. Direct RNA sequencing and early evolution of SARS-CoV-2. 2020. BioRxiv.
 */
 
-
 //--------inputs------------///
 params.virus_reference = '/home/daniel/wuhan_coronavirus_australia.fasta'
 //params.host_reference = '/DataOnline/Data/raw_external/Coronavirus/monkey/newdb/Chlorocebus_sabaeus.ChlSab1.1.dna.toplevel.fa.gz'
@@ -15,8 +14,8 @@ params.host_reference = ''
 params.leader = '/DataOnline/Data/raw_external/Coronavirus/Direct_RNA_Sequence_Cellular/doherty_analysis/leader.fa'
 params.reads = ''
 params.experiment = ''
-
-println(params.reads)
+params.minimap2 = '/sw/minimap2/minimap2-2.11_x64-linux/minimap2'
+params.japsa= ''
 
 host_map="ON"
 
@@ -37,6 +36,24 @@ virus = file(params.virus_reference)
 leader = file(params.leader)
 if (!virus.exists()) exit 1, 'SARS-CoV-2 reference file does not exist: ${params.virus}'
 if (!leader.exists()) exit 1, 'Leader sequence reference file does not exist: ${params.leader}'
+
+log.info """\
+npTranscript - NF
+=================
+See details at https://github.com/lachlancoin/npTranscript
+
+experiment name	: $params.experiment
+
+genome			: $params.virus_reference
+reads			: $params.reads
+host			: $params.host_reference
+leader sequence	: $params.leader
+minimap2		: $params.minimap2
+mapping to host	: $host_map
+japsa jar		: $params.japsa
+
+
+"""
 
 
 //-------launch reads channel------///
