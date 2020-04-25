@@ -27,7 +27,7 @@ ThresholdingAlgo <- function(y,lag,threshold,influence) {
 
 
 ###extract bins with at least 2 consecutive length bins
-bin_thresholds <- function(sig_lengths) {
+bin_thresholds <- function(sig_lengths, bin_size = 50) {
 i=1
 bin_limits <- list()
 
@@ -36,7 +36,7 @@ cont_bin = FALSE
 current_bin = c(0,0)
 ##get length bins
 for (len in sig_lengths) {
-	if (len - prev_len == 50) {
+	if (len - prev_len == bin_size) {
 		if (cont_bin == FALSE) {
 			cont_bin = TRUE
 			current_bin = c(prev_len, len)
