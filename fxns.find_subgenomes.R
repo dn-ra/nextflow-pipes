@@ -47,11 +47,11 @@ find_peaks <- function(flattened_counts, hist_out) {
 		change <- loc_maxima(prior, current, follow)
 		
 		if ( isTRUE(change) ) {
-			cat(prior, follow, '\n') #print out read lengths of i-1 and i+1 to catch reads at peak within 50bp either side
+			cat(hist_out$breaks[i-1], hist_out$breaks[i+1], '\n') #print out read lengths of i-1 and i+1 to catch reads at peak within 50bp either side
 			n_bins=n_bins+1
 		}
 		}
-	message(sprintf('found %d bins', length(n_bins)))
+	message(sprintf('found %d bins', n_bins))
 	}
 
 loc_maxima <- function(x, y, z) {
